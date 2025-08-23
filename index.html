@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAST PRIANGAN HOTEL - Kemewahan di Jantung Priangan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Alpine.js for interactivity -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Favicon (Logo EP) -->
+    <link rel="icon" href="http://googleusercontent.com/file_content/0" type="image/jpeg">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: #F3F4F6; /* Light text */
+        }
+        .font-serif-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-bg {
+            /* Ganti 'URL_GAMBAR_BACKGROUND_ANDA' dengan URL gambar background hotel yang Anda inginkan */
+            background-image: linear-gradient(to bottom, rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 1)), url('https://placehold.co/1920x1080/111827/333333?text=Pemandangan+Hotel+Anda');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .card-bg {
+            background-color: #1F2937; /* Slightly lighter dark for cards */
+        }
+        .btn-gold {
+            background-color: #D4AF37; /* Gold color */
+            color: #111827;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background-color: #EACD65;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+        .section-title {
+            @apply text-4xl md:text-5xl font-serif-display font-bold text-center mb-4 text-white;
+        }
+        .section-subtitle {
+            @apply text-lg text-center text-gray-400 mb-12 max-w-2xl mx-auto;
+        }
+        .glass-effect {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body x-data="{ 
+    isMenuOpen: false, 
+    modalImage: '', 
+    modalImages: [],
+    currentImageIndex: 0,
+    modalTitle: '',
+    zoomLevel: 1,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    translateX: 0,
+    translateY: 0,
+    nextImage() {
+        this.currentImageIndex = (this.currentImageIndex + 1) % this.modalImages.length;
+        this.modalImage = this.modalImages[this.currentImageIndex];
+    },
+    prevImage() {
+        this.currentImageIndex = (this.currentImageIndex - 1 + this.modalImages.length) % this.modalImages.length;
+        this.modalImage = this.modalImages[this.currentImageIndex];
+    },
+    zoomIn() {
+        this.zoomLevel = Math.min(this.zoomLevel + 0.25, 3);
+    },
+    zoomOut() {
+        this.zoomLevel = Math.max(this.zoomLevel - 0.25, 0.5);
+    },
+    resetZoom() {
+        this.zoomLevel = 1;
+        this.translateX = 0;
+        this.translateY = 0;
+    },
+    startDrag(e) {
+        if (this.zoomLevel > 1) {
+            this.isDragging = true;
+            this.startX = e.clientX - this.translateX;
+            this.startY = e.clientY - this.translateY;
+        }
+    },
+    doDrag(e) {
+        if (this.isDragging) {
+            this.translateX = e.clientX - this.startX;
+            this.translateY = e.clientY - this.startY;
+        }
+    },
+    stopDrag() {
+        this.isDragging = false;
+    }
+}">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-effect" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3">
+                <img src="http://googleusercontent.com/file_content/0" alt="Logo EAST PRIANGAN" class="h-12 w-12 object-contain" onerror="this.onerror=null;this.src='foto/logoeastpriangan.png';">
+                <span class="text-xl font-bold font-serif-display text-yellow-400">EAST PRIANGAN</span>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-8 text-white">
+                <a href="#home" class="hover:text-yellow-400 transition">Beranda</a>
+                <a href="#rooms" class="hover:text-yellow-400 transition">Kamar</a>
+                <a href="#facilities" class="hover:text-yellow-400 transition">Fasilitas</a>
+                <a href="#contact" class="hover:text-yellow-400 transition">Kontak</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button @click="isMenuOpen = !isMenuOpen" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="isMenuOpen" @click.away="isMenuOpen = false" class="md:hidden bg-gray-800" x-transition>
+            <a href="#home" @click="isMenuOpen = false" class="block py-2 px-4 text-sm text-white hover:bg-gray-700">Beranda</a>
+            <a href="#rooms" @click="isMenuOpen = false" class="block py-2 px-4 text-sm text-white hover:bg-gray-700">Kamar</a>
+            <a href="#facilities" @click="isMenuOpen = false" class="block py-2 px-4 text-sm text-white hover:bg-gray-700">Fasilitas</a>
+            <a href="#contact" @click="isMenuOpen = false" class="block py-2 px-4 text-sm text-white hover:bg-gray-700">Kontak</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center text-center hero-bg">
+            <div class="container mx-auto px-6">
+                <h1 class="text-5xl md:text-7xl font-extrabold font-serif-display text-white leading-tight mb-4">Selamat Datang Di</h1>
+                <h1 class="text-5xl md:text-7xl font-extrabold font-serif-display text-yellow-400 leading-tight mb-4">EAST PRIANGAN</h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">Nikmati pengalaman menginap tak terlupakan dengan kemewahan dan kenyamanan terbaik.</p>
+                <a href="http://wa.me/6288975876691" target="_blank" class="btn-gold font-bold py-4 px-8 rounded-lg text-lg inline-block">
+                    Reservasi Sekarang
+                </a>
+            </div>
+        </section>
+
+        <!-- Rooms Section -->
+        <section id="rooms" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Akomodasi Pilihan Kami</h2>
+                <p class="section-subtitle">Setiap kamar dirancang untuk memberikan kenyamanan maksimal dengan sentuhan elegan khas Priangan.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <!-- Room Cards -->
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Arileu', 
+                        image: 'foto/Bungalow Arileu/BungalowArileu_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/Bungalow Arileu/Bungalow Arileu_page-0002.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0003.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0004.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0005.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0006.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0007.jpg', 'foto/Bungalow Arileu/Bungalow Arileu_page-0008.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Arileu'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Arileu</h3>
+                            <p class="text-gray-400 mb-4">Kenyamanan modern bertemu dengan desain tradisional yang menawan.</p>
+                            <a href="pdf/BungalowArileu.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Kawung KSA', 
+                        image: 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0002.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0003.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0004.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0005.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0006.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0007.jpg', 'foto/BungalowKawungKSA/Bungalow Kawung KSA_page-0008.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Kawung KSA'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Kawung KSA</h3>
+                            <p class="text-gray-400 mb-4">Ruang luas dengan fasilitas premium untuk pengalaman menginap yang istimewa.</p>
+                             <a href="pdf/BungalowKawungKSA.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Suite Arileu', 
+                        image: 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0002.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0003.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0004.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0005.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0006.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0007.jpg', 'foto/BungalowSuiteArileu/Bungalow Suite Arileu_page-0008.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Suite Arileu'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Suite Arileu</h3>
+                            <p class="text-gray-400 mb-4">Suite mewah yang menawarkan privasi dan pemandangan terbaik.</p>
+                             <a href="pdf/BungalowSuiteArileu.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Deluxe Suite', 
+                        image: 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0002.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0003.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0004.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0005.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0006.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0007.jpg', 'foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0008.jpg ','foto/Bungalow Deluxe Suite/Bungalow Deluxe Suite_page-0009.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Deluxe Suite'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Deluxe Suite</h3>
+                            <p class="text-gray-400 mb-4">Elegan dan luas, pilihan tepat untuk liburan keluarga atau bisnis.</p>
+                             <a href="pdf/BungalowDeluxeSuite.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Suite Room', 
+                        image: 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/BungalowSuiteRoom/Bungalow Suite Room_page-0002.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0003.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0004.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0005.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0006.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0007.jpg', 'foto/BungalowSuiteRoom/Bungalow Suite Room_page-0008.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Suite Room'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Suite Room</h3>
+                            <p class="text-gray-400 mb-4">Kombinasi sempurna antara ruang kerja dan area istirahat yang nyaman.</p>
+                             <a href="pdf/BungalowSuiteArileu.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Bungalow Suite Couple', 
+                        image: 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer"  @click="modalImages = ['foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0002.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0003.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0004.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0005.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0006.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0007.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0008.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0009.jpg', 'foto/Bungalow Suite Couple/Bungalow Suite Couple_page-0010.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Bungalow Suite Couple'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Bungalow Suite Couple</h3>
+                            <p class="text-gray-400 mb-4">Suasana romantis dan fasilitas lengkap untuk momen spesial bersama pasangan.</p>
+                             <a href="pdf/BungalowSuiteCouple.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'Villa Sibentang (2 Bed Room Connecting Door)', 
+                        image: 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang Bed Room Conneting Door_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0001.jpg','foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0002.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0003.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0004.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0005.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0006.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0007.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0008.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0009.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0010.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0011.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0012.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0013.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0014.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0015.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0016.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0017.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0018.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0019.jpg foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0020.jpg', 'foto/Villa Sibentang 2 Bed Room Conneting/Villa Sibentang 2 Bed Room Conneting Door_page-0021.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Villa Sibentang (2 Bed Room Connecting Door)'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Villa Sibentang 2 Bed Room Connecting Door</h3>
+                            <p class="text-gray-400 mb-4">Villa eksklusif dengan dua kamar tidur terhubung, ideal untuk keluarga besar atau grup.</p>
+                             <a href="pdf/Villa Sibentang 2 Bed RoomConnetingDoor.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="card-bg rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300" x-data="{ 
+                        name: 'PACKAGE RATE KSA', 
+                        image: 'foto/Paket KSA/Paket KSA_page-0001.jpg' 
+                    }">
+                        <img :src="image" :alt="name" class="w-full h-56 object-cover cursor-pointer" @click="modalImages = ['foto/Paket KSA/Paket KSA_page-0002.jpg', 'foto/Paket KSA/Paket KSA_page-0003.jpg', 'foto/Paket KSA/Paket KSA_page-0004.jpg', 'foto/Paket KSA/Paket KSA_page-0005.jpg', 'foto/Paket KSA/Paket KSA_page-0006.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='PACKAGE RATE KSA'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Package Rate KSA</h3>
+                            <p class="text-gray-400 mb-4">Nikmati berbagai pilihan paket terbaik untuk momen spesial Anda 🌿💖</p>
+                            <p class="text-gray-400 mb-4">Didesain khusus untuk menghadirkan kenyamanan, kebersamaan, dan pengalaman tak terlupakan.</p>
+                             <a href="pdf/PaketKSA.pdf" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-semibold">Info Detail &rarr;</a>
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="facilities" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Fasilitas & Layanan</h2>
+                <p class="section-subtitle">Kami menyediakan fasilitas lengkap untuk menunjang segala kebutuhan Anda, baik untuk bisnis maupun rekreasi.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-8 text-center">
+                    <!-- Meeting Room (Clickable)-->
+                    <div class="card-bg p-8 rounded-lg cursor-pointer transform hover:-translate-y-2 transition-transform duration-300"
+                        @click="modalImages = ['foto/Meeting Room KSA/Meeting Room KSA_page-0001.jpg', 'foto/Meeting Room KSA/Meeting Room KSA_page-0002.jpg', 'foto/Meeting Room KSA/Meeting Room KSA_page-0003.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Meeting Room KSA'; zoomLevel=0.75; translateX=0; translateY=0">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0c-.454-.303-.977-.454-1.5-.454V5.546c.523 0 1.046-.151 1.5-.454a2.704 2.704 0 013 0 2.704 2.704 0 003 0 2.704 2.704 0 013 0 2.704 2.704 0 003 0c.454.303.977.454 1.5.454v10z"></path></svg>
+                        <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Meeting Room KSA</h3>
+                        <p class="text-gray-400">Ruang pertemuan modern dengan peralatan lengkap untuk kesuksesan acara bisnis Anda.</p>
+                    </div>
+
+                    <!-- Menu Alacarte (Clickable) -->
+                    <div class="card-bg p-8 rounded-lg cursor-pointer transform hover:-translate-y-2 transition-transform duration-300"
+                        @click="modalImages = ['foto/Menu AlaCarte/Menu AlaCarte_page-0001.jpg', 'foto/Menu AlaCarte/Menu Alaqarte_page-0002.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Menu Alacarte'; zoomLevel=0.75; translateX=0; translateY=0">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0c-.454-.303-.977-.454-1.5-.454V5.546c.523 0 1.046-.151 1.5-.454a2.704 2.704 0 013 0 2.704 2.704 0 003 0 2.704 2.704 0 013 0 2.704 2.704 0 003 0c.454.303.977.454 1.5.454v10z"></path></svg>
+                        <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Menu Alacarte</h3>
+                        <p class="text-gray-400">Sajian kuliner istimewa dari chef kami, menyajikan cita rasa lokal dan internasional terbaik.</p>
+                    </div>
+
+                    <!-- Menu Dinner (Clickable) -->
+                    <div class="card-bg p-8 rounded-lg cursor-pointer transform hover:-translate-y-2 transition-transform duration-300"
+                        @click="modalImages = ['foto/Menu Dinner/Menu Dinner_page-0001.jpg', 'foto/Menu Dinner/Menu Dinner_page-0002.jpg', 'foto/Menu Dinner/Menu Dinner_page-0003.jpg', 'foto/Menu Dinner/Menu Dinner_page-0004.jpg', 'foto/Menu Dinner/Menu Dinner_page-0005.jpg']; modalImage = modalImages[0]; currentImageIndex = 0; modalTitle='Menu Dinner'; zoomLevel=0.75; translateX=0; translateY=0">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0c-.454-.303-.977-.454-1.5-.454V5.546c.523 0 1.046-.151 1.5-.454a2.704 2.704 0 013 0 2.704 2.704 0 003 0 2.704 2.704 0 013 0 2.704 2.704 0 003 0c.454.303.977.454 1.5.454v10z"></path></svg>
+                        <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Menu Dinner</h3>
+                        <p class="text-gray-400">Sajian kuliner istimewa dari chef kami, menyajikan cita rasa lokal dan internasional terbaik.</p>
+                    </div>
+                    
+                    <!-- Denah KSA (Clickable) -->
+                    <div class="card-bg p-8 rounded-lg cursor-pointer transform hover:-translate-y-2 transition-transform duration-300" 
+                         @click="modalImage='foto/Denah KSA_pages-to-jpg-0001.jpg'; modalTitle='Denah Lokasi KSA'; zoomLevel=0.75; translateX=0; translateY=0">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 10v-5h6v5m0 0l-6-3m6 3V7"></path></svg>
+                        <h3 class="text-2xl font-bold font-serif-display mb-2 text-white">Denah KSA</h3>
+                        <p class="text-gray-400">Klik untuk melihat denah lokasi lengkap hotel kami.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="section-title">Hubungi Kami</h2>
+                 <p class="section-subtitle">Tim kami siap membantu Anda 24/7. Jangan ragu untuk menghubungi kami untuk informasi lebih lanjut atau melakukan reservasi.</p>
+                 <a href="http://wa.me/6288975876691" target="_blank" class="btn-gold font-bold py-4 px-10 rounded-lg text-xl inline-flex items-center space-x-3">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.803 6.166l-1.225 4.485 4.575-1.196z"/></svg>
+                    <span>Chat via WhatsApp</span>
+                 </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-700 py-8">
+        <div class="container mx-auto px-6 text-center text-yellow-400">
+            <p>&copy; <span id="year"></span> EAST PRIANGAN. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Design By Nita-Anggraeni</p>
+        </div>
+    </footer>
+
+    <!-- Image Modal -->
+    <div x-show="modalImage" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style="display: none;">
+        <div @click.away="modalImage = ''; modalImages = []; resetZoom()" class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-full overflow-hidden relative">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800" x-text="modalTitle"></h3>
+                <div class="flex items-center space-x-2">
+                    <!-- Zoom Controls -->
+                    <button @click="zoomOut()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                        </svg>
+                    </button>
+                    <button @click="zoomIn()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                    <button @click="resetZoom()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded text-sm">Reset</button>
+                    <button @click="modalImage = ''; modalImages = []; resetZoom()" class="text-gray-500 hover:text-gray-800 ml-2">&times;</button>
+                </div>
+            </div>
+            <div class="p-4 relative overflow-auto" style="max-height: 85vh;">
+                <div class="flex items-center justify-center">
+                    <img :src="modalImage" 
+                         alt="Detail Gambar" 
+                         class="rounded-md cursor-move transition-transform duration-150 max-w-full h-auto object-contain"
+                         :style="'transform: scale(' + zoomLevel + ') translate(' + translateX/zoomLevel + 'px, ' + translateY/zoomLevel + 'px)'"
+                         @mousedown="startDrag"
+                         @mousemove="doDrag"
+                         @mouseup="stopDrag"
+                         @mouseleave="stopDrag"
+                         draggable="false">
+                
+                <!-- Navigation Buttons (only show if there are multiple images) -->
+                <template x-if="modalImages.length > 1">
+                    <div class="absolute inset-y-0 left-0 right-0 flex justify-between items-center px-4">
+                        <button @click="prevImage()" class="bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-75 transition-opacity">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button @click="nextImage()" class="bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-75 transition-opacity">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </template>
+                
+                <!-- Image Counter -->
+                <template x-if="modalImages.length > 1">
+                    <div class="absolute bottom-6 left-0 right-0 text-center">
+                        <span class="bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-sm">
+                            <span x-text="currentImageIndex + 1"></span>/<span x-text="modalImages.length"></span>
+                        </span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script untuk tahun di footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Script untuk mengubah background header saat scroll
+        const navbar = document.getElementById('navbar');
+        window.onscroll = () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-opacity-90');
+            } else {
+                navbar.classList.remove('bg-opacity-90');
+            }
+        };
+    </script>
+
+</body>
+</html>
